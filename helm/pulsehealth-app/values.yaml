@@ -1,0 +1,74 @@
+# ============================================================
+# values.yaml — DEFAULTS for the pulsehealth-app chart
+# ============================================================
+# Every value here is a sensible default. Per-app files in
+# helm/values/ override only what differs (name, image, host,
+# replica counts). Think of this as the "base class".
+# ============================================================
+
+# App identity — ALWAYS overridden per app
+nameOverride: ""       # e.g. "patient-portal"
+namespace: "default"   # e.g. "patient-portal" (must match k8s/namespaces.yaml)
+
+replicaCount: 2
+
+image:
+  repository: ""            # e.g. acrpulsehealthdev001.azurecr.io/patient-portal
+  tag: "latest"
+  pullPolicy: IfNotPresent
+
+# Container port the app listens on
+containerPort: 8080
+
+service:
+  type: ClusterIP          # traffic enters via the shared NGINX Ingress, not per-app LBs
+  port: 80
+
+# ── Ingress (NGINX + TLS) ────────────────────────────────────
+ingress:
+  enabled: true
+  className: nginx
+  host: ""                 # e.g. patient-portal.pulsehealth.example.com
+  path: /
+  pathType: Prefix
+  tls:
+    enabled: true
+    secretName: ""         # e.g. patient-portal-tls (created by cert-manager)
+    # cert-manager issues + renews the cert when this annotation is present:
+    clusterIssuer: letsencrypt-prod
+  annotations: {}
+
+# ── Horizontal Pod Autoscaler (peak clinic hours) ────────────
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: 80
+
+# ── Resource requests/limits ─────────────────────────────────
+# Requests must be set for the HPA CPU target to mean anything.
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 500m
+    memory: 256Mi
+
+# ── ServiceAccount (per-team identity inside the namespace) ──
+serviceAccount:
+  create: true
+  name: ""                 # defaults to the release/app name if empty
+
+# ── Health probes ────────────────────────────────────────────
+probes:
+  liveness:
+    path: /health
+  readiness:
+    path: /health
+
+# Extra environment variables passed to the container
+env: []
+  # - name: LOG_LEVEL
+  #   value: "info"

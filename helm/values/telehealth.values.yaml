@@ -1,0 +1,39 @@
+# ============================================================
+# telehealth.values.yaml  (video visit app)
+# ============================================================
+# helm upgrade --install telehealth ./helm/pulsehealth-app \
+#   -n telehealth -f helm/values/telehealth.values.yaml
+# ============================================================
+nameOverride: telehealth
+namespace: telehealth
+
+image:
+  repository: acrpulsehealthdev001.azurecr.io/telehealth
+  tag: latest
+
+ingress:
+  enabled: true
+  host: telehealth.pulsehealth.example.com
+  tls:
+    enabled: true
+    secretName: telehealth-tls
+    clusterIssuer: letsencrypt-prod
+
+# Video is CPU/memory heavy per session — bigger pods, tighter target.
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 60
+
+resources:
+  requests:
+    cpu: 250m
+    memory: 256Mi
+  limits:
+    cpu: "1"
+    memory: 512Mi
+
+serviceAccount:
+  create: true
+  name: telehealth-sa

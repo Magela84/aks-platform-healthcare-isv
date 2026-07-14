@@ -1,0 +1,25 @@
+# ============================================================
+# Chart.yaml — PulseHealth reusable application chart
+# ============================================================
+# ONE chart, deployed 4 times (one release per patient app) with
+# a different values file each time. This is the "standardized way
+# to package and release each app" from the client brief.
+# ============================================================
+apiVersion: v2
+name: pulsehealth-app
+description: Reusable Helm chart for a PulseHealth patient-facing application (Deployment, Service, Ingress+TLS, HPA, ServiceAccount).
+type: application
+
+# version        = the chart's own version (bump when templates change)
+# appVersion     = the default app image version (overridable per app)
+version: 0.1.0
+appVersion: "1.0.0"
+
+maintainers:
+  - name: Magela84
+    url: https://github.com/Magela84
+
+keywords:
+  - aks
+  - healthcare
+  - helm

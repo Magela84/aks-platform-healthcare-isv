@@ -1,0 +1,47 @@
+# ============================================================
+# appointments-rbac.yaml — namespace-scoped RBAC
+# ============================================================
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: scheduling-team-role
+  namespace: appointments
+rules:
+  - apiGroups: ["", "apps", "autoscaling", "networking.k8s.io"]
+    resources: ["pods", "pods/log", "services", "deployments", "replicasets", "horizontalpodautoscalers", "ingresses", "configmaps"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: scheduling-team-binding
+  namespace: appointments
+subjects:
+  - kind: ServiceAccount
+    name: appointments-sa
+    namespace: appointments
+  - kind: Group
+    name: "REPLACE_WITH_SCHEDULING_TEAM_AAD_GROUP_OBJECT_ID"
+    apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: Role
+  name: scheduling-team-role
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-cross-tenant
+  namespace: appointments
+spec:
+  podSelector: {}
+  policyTypes: ["Ingress"]
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              tenant: appointments
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: ingress-nginx

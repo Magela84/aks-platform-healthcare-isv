@@ -1,0 +1,31 @@
+# ============================================================
+# appointments.values.yaml  (scheduling app)
+# ============================================================
+# helm upgrade --install appointments ./helm/pulsehealth-app \
+#   -n appointments -f helm/values/appointments.values.yaml
+# ============================================================
+nameOverride: appointments
+namespace: appointments
+
+image:
+  repository: acrpulsehealthdev001.azurecr.io/appointments
+  tag: latest
+
+ingress:
+  enabled: true
+  host: appointments.pulsehealth.example.com
+  tls:
+    enabled: true
+    secretName: appointments-tls
+    clusterIssuer: letsencrypt-prod
+
+# Spiky right at clinic open — scale fast, moderate ceiling.
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 8
+  targetCPUUtilizationPercentage: 70
+
+serviceAccount:
+  create: true
+  name: appointments-sa

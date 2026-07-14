@@ -1,0 +1,50 @@
+# ============================================================
+# deployment.yaml — the app workload
+# ============================================================
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "pulsehealth-app.name" . }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "pulsehealth-app.labels" . | nindent 4 }}
+spec:
+  # When the HPA is enabled it owns the replica count, so we omit
+  # replicas here to avoid Helm and the HPA fighting each other.
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "pulsehealth-app.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "pulsehealth-app.labels" . | nindent 8 }}
+    spec:
+      serviceAccountName: {{ include "pulsehealth-app.serviceAccountName" . }}
+      containers:
+        - name: {{ include "pulsehealth-app.name" . }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.containerPort }}
+          {{- with .Values.env }}
+          env:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          livenessProbe:
+            httpGet:
+              path: {{ .Values.probes.liveness.path }}
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 15
+          readinessProbe:
+            httpGet:
+              path: {{ .Values.probes.readiness.path }}
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}

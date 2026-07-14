@@ -1,0 +1,31 @@
+# ============================================================
+# billing.values.yaml
+# ============================================================
+# helm upgrade --install billing ./helm/pulsehealth-app \
+#   -n billing -f helm/values/billing.values.yaml
+# ============================================================
+nameOverride: billing
+namespace: billing
+
+image:
+  repository: acrpulsehealthdev001.azurecr.io/billing
+  tag: latest
+
+ingress:
+  enabled: true
+  host: billing.pulsehealth.example.com
+  tls:
+    enabled: true
+    secretName: billing-tls
+    clusterIssuer: letsencrypt-prod
+
+# Steadier internal-facing load — conservative scaling.
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 6
+  targetCPUUtilizationPercentage: 75
+
+serviceAccount:
+  create: true
+  name: billing-sa

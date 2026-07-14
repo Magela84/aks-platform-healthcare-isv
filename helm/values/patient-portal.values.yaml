@@ -1,0 +1,32 @@
+# ============================================================
+# patient-portal.values.yaml
+# ============================================================
+# Deploy with:
+#   helm upgrade --install patient-portal ./helm/pulsehealth-app \
+#     -n patient-portal -f helm/values/patient-portal.values.yaml
+# ============================================================
+nameOverride: patient-portal
+namespace: patient-portal
+
+image:
+  repository: acrpulsehealthdev001.azurecr.io/patient-portal
+  tag: latest
+
+ingress:
+  enabled: true
+  host: patient-portal.pulsehealth.example.com
+  tls:
+    enabled: true
+    secretName: patient-portal-tls
+    clusterIssuer: letsencrypt-prod
+
+# Portal is the highest-traffic app — give it the most headroom.
+autoscaling:
+  enabled: true
+  minReplicas: 3
+  maxReplicas: 12
+  targetCPUUtilizationPercentage: 65
+
+serviceAccount:
+  create: true
+  name: patient-portal-sa

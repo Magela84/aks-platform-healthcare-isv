@@ -1,0 +1,58 @@
+# ============================================================
+# patient-portal-rbac.yaml — namespace-scoped RBAC
+# ============================================================
+# Grants the portal team a Role that CANNOT escape this namespace.
+# Bound to:
+#   - the app ServiceAccount (created by Helm)
+#   - a team AAD group (edit the group object ID below)
+# Apply: kubectl apply -f k8s/rbac/patient-portal-rbac.yaml
+# ============================================================
+---
+# What the portal team may do INSIDE their namespace.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: portal-team-role
+  namespace: patient-portal
+rules:
+  - apiGroups: ["", "apps", "autoscaling", "networking.k8s.io"]
+    resources: ["pods", "pods/log", "services", "deployments", "replicasets", "horizontalpodautoscalers", "ingresses", "configmaps"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: portal-team-binding
+  namespace: patient-portal
+subjects:
+  # 1) The running app's ServiceAccount
+  - kind: ServiceAccount
+    name: patient-portal-sa
+    namespace: patient-portal
+  # 2) The human team — replace with your AAD group's object ID
+  - kind: Group
+    name: "REPLACE_WITH_PORTAL_TEAM_AAD_GROUP_OBJECT_ID"
+    apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: Role
+  name: portal-team-role
+  apiGroup: rbac.authorization.k8s.io
+---
+# Default-deny NetworkPolicy: pods here accept traffic only from the
+# ingress controller + same namespace, not from other tenants.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-cross-tenant
+  namespace: patient-portal
+spec:
+  podSelector: {}
+  policyTypes: ["Ingress"]
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              tenant: patient-portal
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: ingress-nginx

@@ -1,0 +1,30 @@
+# ============================================================
+# terraform.tfvars.example — PulseHealth AKS + Helm Platform
+# ============================================================
+# HOW TO USE:
+#   1. Copy this file to terraform.tfvars
+#        cp terraform.tfvars.example terraform.tfvars
+#   2. Fill in your real Subscription ID and Tenant ID
+#   3. terraform.tfvars is git-ignored, so real IDs never get pushed
+#
+# Alternatively (great for Cloud Shell / CI) skip the file and export:
+#   export ARM_SUBSCRIPTION_ID="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+#   export ARM_TENANT_ID="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+# ============================================================
+
+subscription_id = "REPLACE_WITH_YOUR_SUBSCRIPTION_ID"
+tenant_id       = "REPLACE_WITH_YOUR_TENANT_ID"
+
+project     = "pulsehealth"
+environment = "dev"
+owner       = "Magela84"
+location    = "East US"
+
+# ── Node sizing (tune for cost vs capacity) ──
+system_node_count = 1
+user_node_min     = 1
+user_node_max     = 4
+
+# ── Tiers ──
+aks_sku_tier = "Free"   # Standard for production SLA
+acr_sku      = "Basic"

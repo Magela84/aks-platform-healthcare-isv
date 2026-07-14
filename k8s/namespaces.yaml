@@ -1,0 +1,45 @@
+# ============================================================
+# namespaces.yaml — one namespace per patient app (tenant)
+# ============================================================
+# Apply first, before any Helm release:
+#   kubectl apply -f k8s/namespaces.yaml
+#
+# The pod-security labels enforce the "restricted" standard, a good
+# healthcare-grade default (no privileged pods, no host access).
+# ============================================================
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: patient-portal
+  labels:
+    tenant: patient-portal
+    part-of: pulsehealth
+    pod-security.kubernetes.io/enforce: restricted
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: appointments
+  labels:
+    tenant: appointments
+    part-of: pulsehealth
+    pod-security.kubernetes.io/enforce: restricted
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: telehealth
+  labels:
+    tenant: telehealth
+    part-of: pulsehealth
+    pod-security.kubernetes.io/enforce: restricted
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: billing
+  labels:
+    tenant: billing
+    part-of: pulsehealth
+    pod-security.kubernetes.io/enforce: restricted

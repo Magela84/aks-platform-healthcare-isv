@@ -1,0 +1,47 @@
+# ============================================================
+# telehealth-rbac.yaml — namespace-scoped RBAC
+# ============================================================
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: telehealth-team-role
+  namespace: telehealth
+rules:
+  - apiGroups: ["", "apps", "autoscaling", "networking.k8s.io"]
+    resources: ["pods", "pods/log", "services", "deployments", "replicasets", "horizontalpodautoscalers", "ingresses", "configmaps"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: telehealth-team-binding
+  namespace: telehealth
+subjects:
+  - kind: ServiceAccount
+    name: telehealth-sa
+    namespace: telehealth
+  - kind: Group
+    name: "REPLACE_WITH_TELEHEALTH_TEAM_AAD_GROUP_OBJECT_ID"
+    apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: Role
+  name: telehealth-team-role
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-cross-tenant
+  namespace: telehealth
+spec:
+  podSelector: {}
+  policyTypes: ["Ingress"]
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              tenant: telehealth
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: ingress-nginx

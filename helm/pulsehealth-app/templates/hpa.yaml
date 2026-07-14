@@ -1,0 +1,37 @@
+# ============================================================
+# hpa.yaml — HorizontalPodAutoscaler (peak clinic hours)
+# ============================================================
+# Scales pods OUT when CPU/memory cross the targets, and back IN
+# when load drops. Works together with the cluster autoscaler on
+# the user node pool (Terraform) so both pods AND nodes scale.
+{{- if .Values.autoscaling.enabled }}
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ include "pulsehealth-app.name" . }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "pulsehealth-app.labels" . | nindent 4 }}
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ include "pulsehealth-app.name" . }}
+  minReplicas: {{ .Values.autoscaling.minReplicas }}
+  maxReplicas: {{ .Values.autoscaling.maxReplicas }}
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.autoscaling.targetCPUUtilizationPercentage }}
+    {{- if .Values.autoscaling.targetMemoryUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.autoscaling.targetMemoryUtilizationPercentage }}
+    {{- end }}
+{{- end }}

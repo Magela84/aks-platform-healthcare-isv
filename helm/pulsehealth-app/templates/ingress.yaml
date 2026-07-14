@@ -1,0 +1,41 @@
+# ============================================================
+# ingress.yaml — routes external HTTPS traffic to this app
+# ============================================================
+# Uses the shared NGINX Ingress Controller (one cluster LB for all
+# apps). cert-manager issues + auto-renews the TLS cert when the
+# cluster-issuer annotation is present.
+{{- if .Values.ingress.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "pulsehealth-app.name" . }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "pulsehealth-app.labels" . | nindent 4 }}
+  annotations:
+    {{- if and .Values.ingress.tls.enabled .Values.ingress.tls.clusterIssuer }}
+    cert-manager.io/cluster-issuer: {{ .Values.ingress.tls.clusterIssuer | quote }}
+    {{- end }}
+    {{- with .Values.ingress.annotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  ingressClassName: {{ .Values.ingress.className }}
+  {{- if .Values.ingress.tls.enabled }}
+  tls:
+    - hosts:
+        - {{ .Values.ingress.host | quote }}
+      secretName: {{ .Values.ingress.tls.secretName | quote }}
+  {{- end }}
+  rules:
+    - host: {{ .Values.ingress.host | quote }}
+      http:
+        paths:
+          - path: {{ .Values.ingress.path }}
+            pathType: {{ .Values.ingress.pathType }}
+            backend:
+              service:
+                name: {{ include "pulsehealth-app.name" . }}
+                port:
+                  number: {{ .Values.service.port }}
+{{- end }}

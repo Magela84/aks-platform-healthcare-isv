@@ -1,0 +1,33 @@
+# ── Terraform ────────────────────────────────────────────────
+**/.terraform/*
+*.tfstate
+*.tfstate.*
+*.tfplan
+tfplan
+crash.log
+crash.*.log
+
+# Real secrets / IDs — NEVER commit. Use the .example instead.
+terraform.tfvars
+*.auto.tfvars
+.env
+*.pem
+*.key
+
+# ── Kube / Helm ──────────────────────────────────────────────
+kubeconfig
+*.kubeconfig
+charts/
+*.tgz
+
+# ── OS / editor ──────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+
+# ── Python (placeholder apps) ────────────────────────────────
+__pycache__/
+*.pyc
+.venv/

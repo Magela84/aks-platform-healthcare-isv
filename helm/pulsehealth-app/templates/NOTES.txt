@@ -1,0 +1,22 @@
+============================================================
+  {{ include "pulsehealth-app.name" . }} deployed to namespace "{{ .Values.namespace }}"
+============================================================
+
+Release : {{ .Release.Name }}
+Chart   : {{ .Chart.Name }}-{{ .Chart.Version }}
+Image   : {{ .Values.image.repository }}:{{ .Values.image.tag }}
+
+Check rollout:
+  kubectl rollout status deployment/{{ include "pulsehealth-app.name" . }} -n {{ .Values.namespace }}
+
+See pods and the HPA:
+  kubectl get pods,hpa -n {{ .Values.namespace }}
+
+{{- if .Values.ingress.enabled }}
+
+Public URL (once DNS points at the NGINX ingress external IP):
+  https://{{ .Values.ingress.host }}
+
+Find the ingress external IP:
+  kubectl get svc -n ingress-nginx ingress-nginx-controller
+{{- end }}
