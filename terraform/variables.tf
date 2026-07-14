@@ -69,7 +69,7 @@ variable "aks_sku_tier" {
 variable "system_node_vm_size" {
   description = "VM size for the system node pool."
   type        = string
-  default     = "Standard_D2s_v3" # 2 vCPU, 8 GB — solid baseline for add-ons
+  default     = "Standard_B2s" # 2 vCPU, 8 GB — solid baseline for add-ons
 }
 
 variable "system_node_count" {
@@ -84,7 +84,7 @@ variable "system_node_count" {
 variable "user_node_vm_size" {
   description = "VM size for the user node pool that runs the apps."
   type        = string
-  default     = "Standard_D2s_v3"
+  default     = "Standard_B2s"
 }
 
 variable "user_node_min" {

@@ -122,7 +122,7 @@ resource "azurerm_kubernetes_cluster_node_pool" "user" {
   mode                  = "User"
   os_disk_size_gb       = 30
 
-  auto_scaling_enabled = true
+  enable_auto_scaling = true
   min_count            = var.user_node_min
   max_count            = var.user_node_max
 
