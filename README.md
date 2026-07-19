@@ -28,6 +28,40 @@ Each patient application is deployed in its own namespace with autoscaling:
 - **appointments:** HPA, 2–8 pods
 - **telehealth:** HPA, 2–10 pods
 - **billing:** HPA, 1–4 pods
+# AKS Platform Migration – Healthcare ISV Engagement
+
+## Overview
+...
+
+## Problem Statement
+...
+
+## What I Built
+...
+
+## Architecture
+...
+
+## Technologies Used
+- **Microsoft Azure** (AKS, Virtual Networks, RBAC, Private Endpoints, Key Vault)
+- **Infrastructure as Code:** Terraform, Bicep, ARM Templates
+- **Containers & CI/CD:** Helm, Docker, Azure Container Registry (ACR), GitHub Actions
+- **Automation & Scripting:** PowerShell, Azure CLI, Bash
+- **Observability:** Azure Monitor, Log Analytics, KQL
+- **Security:** NSGs, Managed Identities, NetworkPolicy
+- **Languages:** Python, Flask
+
+## Subscription Note
+...
+
+## Usage
+...
+
+## Engagement Outcome
+...
+
+## Author
+...
 
 ## Technologies Used
 - **Kubernetes**, **AKS**
